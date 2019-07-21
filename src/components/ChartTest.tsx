@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as d3 from 'd3';
+import ReactTooltip from 'react-tooltip';
 
 interface Props {
     textToDisplay: string;
@@ -16,6 +17,7 @@ interface DataItem {
 
 interface ThisState {
     data: DataItem[];
+    name?: string;
 }
   
 class ChartTest extends React.Component<Props, ThisState> {
@@ -23,9 +25,12 @@ class ChartTest extends React.Component<Props, ThisState> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            data: this.getData()
+            data: this.getData(),
+            name: undefined
         };
     }
+
+    private fooRef = React.createRef<HTMLDivElement>();
     
     render() {
 
@@ -40,10 +45,27 @@ class ChartTest extends React.Component<Props, ThisState> {
                                                 cx={xScale(d.x)}
                                                 cy={yScale(d.y)}
                                                 r={rScale(d.r)}
-                                                fill={colours[d.colour]} />)
+                                                fill={colours[d.colour]} />);
+
+        const checkValidation = () => {
+            if (this.state.name && this.state.name.length === 1) {
+                ReactTooltip.show(this.fooRef.current as Element);
+            }
+            else {
+                ReactTooltip.hide(this.fooRef.current as Element)
+            }
+        }
 
         return <div>
-            <svg width={this.props.width} height={this.props.height}>{points}</svg>
+            <div>{this.state.name}</div>
+            <input onChange={(event) => {
+                this.setState({
+                    name: event.target.value
+                })
+             }} />
+            <div ref={this.fooRef} data-tip='tooltip' data-event='jh'>hahaha</div>
+            <button onClick={() => checkValidation() }>CLICK</button>
+            <ReactTooltip />
         </div>
 
     }
